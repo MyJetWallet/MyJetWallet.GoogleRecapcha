@@ -1,0 +1,11 @@
+name: Build test
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+
+jobs:
+  build_test:
+    uses: MyJetWallet/DevOps/.github/workflows/build_test_libs.yml@master
