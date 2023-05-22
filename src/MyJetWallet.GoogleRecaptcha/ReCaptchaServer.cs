@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace MyJetWallet.GoogleRecaptcha;
 
-public class ReCaptchaServer: IDisposable
+public class ReCaptchaServer: IDisposable, IReCaptchaServer
 {
     private string _securityKey;
     private readonly float _minScore;
