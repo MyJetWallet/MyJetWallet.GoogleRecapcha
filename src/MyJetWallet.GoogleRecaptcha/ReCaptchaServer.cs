@@ -8,15 +8,27 @@ public class ReCaptchaServer: IDisposable
 {
     private string _securityKey;
     private readonly float _minScore;
+    private readonly string _allowAlwaysCode;
 
-    public ReCaptchaServer(string securityKey, float minScore)
+    public ReCaptchaServer(string securityKey, float minScore, string allowAlwaysCode)
     {
         _securityKey = securityKey;
         _minScore = minScore;
+        _allowAlwaysCode = allowAlwaysCode;
     }
 
     public async Task<ValidateTokenResponse> ValidateTokenAsync(string token ,string clientIp)
     {
+        if (!string.IsNullOrEmpty(_allowAlwaysCode) && token == _allowAlwaysCode)
+        {
+            return new ValidateTokenResponse()
+            {
+                Success = true,
+                Error = "Internal allow",
+                StatusCode = HttpStatusCode.OK
+            };
+        }
+        
         var dictionary = new Dictionary<string, string>
         {
             { "secret", _securityKey },

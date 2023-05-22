@@ -3,7 +3,7 @@
 using MyJetWallet.GoogleRecaptcha;
 using Newtonsoft.Json;
 
-var service = new ReCaptchaServer("SECRET_KEY", 0.5f);
+var service = new ReCaptchaServer("SECRET_KEY", 0.5f, string.Empty);
 
 
 var resp = await service.ValidateTokenAsync(
