@@ -2,5 +2,5 @@ namespace MyJetWallet.GoogleRecaptcha;
 
 public interface IReCaptchaServer
 {
-    Task<ValidateTokenResponse> ValidateTokenAsync(string token ,string clientIp);
+    Task<ValidateTokenResponse> ValidateTokenAsync(string token, string action);
 }

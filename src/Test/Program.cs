@@ -3,12 +3,12 @@
 using MyJetWallet.GoogleRecaptcha;
 using Newtonsoft.Json;
 
-var service = new ReCaptchaServer("SECRET_KEY", 0.5f, string.Empty);
+var service = new ReCaptchaServer("SECRET_KEY", 0.5f, string.Empty, string.Empty);
 
 
 var resp = await service.ValidateTokenAsync(
-    "", 
-    string.Empty);
+    "token",
+    "action");
 
 Console.WriteLine(JsonConvert.SerializeObject(resp, Formatting.Indented));
 

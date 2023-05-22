@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Http.Json;
 using Newtonsoft.Json;
 
 namespace MyJetWallet.GoogleRecaptcha;
@@ -9,15 +8,17 @@ public class ReCaptchaServer: IDisposable, IReCaptchaServer
     private string _securityKey;
     private readonly float _minScore;
     private readonly string _allowAlwaysCode;
+    private readonly string _allowHost;
 
-    public ReCaptchaServer(string securityKey, float minScore, string allowAlwaysCode)
+    public ReCaptchaServer(string securityKey, float minScore, string allowAlwaysCode, string allowHost)
     {
         _securityKey = securityKey;
         _minScore = minScore;
         _allowAlwaysCode = allowAlwaysCode;
+        _allowHost = allowHost;
     }
 
-    public async Task<ValidateTokenResponse> ValidateTokenAsync(string token ,string clientIp)
+    public async Task<ValidateTokenResponse> ValidateTokenAsync(string token, string action)
     {
         if (!string.IsNullOrEmpty(_allowAlwaysCode) && token == _allowAlwaysCode)
         {
@@ -34,10 +35,6 @@ public class ReCaptchaServer: IDisposable, IReCaptchaServer
             { "secret", _securityKey },
             { "response", token }
         };
-        if (!string.IsNullOrEmpty(clientIp))
-        {
-            dictionary["remoteip"] = clientIp;
-        }
         
         var postContent = new FormUrlEncodedContent(dictionary);
          
@@ -103,6 +100,30 @@ public class ReCaptchaServer: IDisposable, IReCaptchaServer
             {
                 Success = false,
                 Error = $"It might be a boat. Bad score: {reCaptchaResponse.Score}",
+                StatusCode = resp.StatusCode,
+                HttpResponseBody = stringContent,
+                Response = reCaptchaResponse
+            };
+        }
+        
+        if (!string.IsNullOrEmpty(_allowHost) && reCaptchaResponse.Hostname != _allowHost)
+        {
+            return new ValidateTokenResponse()
+            {
+                Success = false,
+                Error = $"It might be a boat. Bad host: {reCaptchaResponse.Hostname}",
+                StatusCode = resp.StatusCode,
+                HttpResponseBody = stringContent,
+                Response = reCaptchaResponse
+            };
+        }
+        
+        if (!string.IsNullOrEmpty(action) && reCaptchaResponse.Action != action)
+        {
+            return new ValidateTokenResponse()
+            {
+                Success = false,
+                Error = $"It might be a boat. Bad action: {reCaptchaResponse.Action}, Expected: {action}",
                 StatusCode = resp.StatusCode,
                 HttpResponseBody = stringContent,
                 Response = reCaptchaResponse
